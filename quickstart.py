@@ -64,7 +64,7 @@ def main():
 
     results = service.files().list(
        pageSize=10,fields="nextPageToken, files").execute()
-    # import pdb; pdb.set_trace()
+    
     items = results.get('files', [])
 
     if not items:
@@ -74,17 +74,15 @@ def main():
         for item in items:
             if item['mimeType'] == 'application/vnd.google-apps.document': #this is the mimetype in the file 
                 print('{0} ({1})'.format(item['name'], item['id']))
-                import pdb; pdb.set_trace()
+                
                 file_id = item['id']
                 request = service.files().export_media(fileId=file_id, mimeType="application/vnd.oasis.opendocument.text") #this is the mimetype you have to download it with
-                from pprint import pprint
-                pprint(request)
+                
                 fh = io.BytesIO()
                 downloader = MediaIoBaseDownload(fh, request, chunksize=1024)
                 done = False
                 while done is False:
                     status, done = downloader.next_chunk()
-
                     print("Download %d%%." % int(status.progress() * 100) )
                 with open(item['name'], 'wb+') as f:
                     f.write(fh.getvalue())
